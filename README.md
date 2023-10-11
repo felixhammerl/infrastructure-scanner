@@ -10,7 +10,7 @@ It orchestrates AWS Step Functions, Lambda, and ECS to do all the heavy lifting 
 - [x] Create an ECS task to scans your infrastruture with Cloudsploit.
 - [x] Assume `OrganizationAccountAccessRole` to scan child accounts.
 - [x] Write the scan reports to `s3://$S3_BUCKET/$DATE/$ACCOUNT.json`.
-- [ ] Add pipeline to continuously deploy to AWS account.
+- [ ] Add GH Actions pipeline to continuously deploy to AWS account.
 - [ ] Add a way to exclude accounts.
 - [ ] Soft fail when `OrganizationAccountAccessRole` is not present.
 - [ ] Gather the scan reports from all accounts in a single report.
