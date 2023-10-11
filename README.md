@@ -2,7 +2,21 @@
 
 This repository contains all of the code necessary to scan infra in AWS with [Cloudsploit](https://github.com/aquasecurity/cloudsploit).
 
-It orchestrates AWS Step Functions, Lambda, and ECS to do all the heavy lifting around CSPM scanning. In short, a Python Lambda that lists out the sub-accounts in the org and then fires off an ECS task that scans your infrastruture with Cloudsploit and writes the result to `s3://$S3_BUCKET/$DATE/$ACCOUNT.json`.
+It orchestrates AWS Step Functions, Lambda, and ECS to do all the heavy lifting around CSPM scanning. 
+
+- A Python Lambda that lists out the sub-accounts in the org (excluding the payer account).
+- We naïvely assume that the child accounts have `OrganizationAccountAccessRole` present.
+- An ECS task that scans your infrastruture with Cloudsploit.
+- The scan report gets written to `s3://$S3_BUCKET/$DATE/$ACCOUNT.json`.
+
+## TODO
+
+- [ ] Add a way to exclude accounts.
+- [ ] Soft fail when `OrganizationAccountAccessRole` is not present.
+- [ ] Gather the scan reports from all accounts in a single report.
+- [ ] Transform the unified scan report into a nice HTML view.
+- [ ] Add a static S3+Cloudfront site displaying the scan results.
+- [ ] Add simple HTTP auth for the scan result site
 
 ## Requirements
 
