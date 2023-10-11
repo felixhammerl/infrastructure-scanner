@@ -13,7 +13,7 @@ def list_accounts(event, context):
         account["Id"] for account in accounts if account.get("Status") == "ACTIVE"
     ]
 
-    payer_account_id = boto3.client('sts').get_caller_identity().get('Account')
+    payer_account_id = boto3.client("sts").get_caller_identity().get("Account")
     ignored_account_ids = [payer_account_id]
 
     return list(set(accounts) - set(ignored_account_ids))
