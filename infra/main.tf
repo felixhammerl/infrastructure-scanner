@@ -116,6 +116,37 @@ module "step_scan" {
   iam_policy_json = data.aws_iam_policy_document.step_scan_task_policy.json
 }
 
+data "aws_iam_policy_document" "step_gather_iam_policy" {
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      aws_s3_bucket.scan_results.arn,
+      "${aws_s3_bucket.scan_results.arn}/*"
+    ]
+  }
+}
+
+module "step_gather" {
+  source          = "./lambda"
+  function_name   = "${local.service}-gather"
+  pkg_path        = "${path.root}/../build/gather"
+  handler         = "src/handler/gather.gather_results"
+  iam_policy_json = data.aws_iam_policy_document.step_gather_iam_policy.json
+}
+
 module "sfn" {
   source      = "./sfn"
   module_name = local.service
@@ -128,6 +159,7 @@ module "sfn" {
     subnets             = module.step_scan.subnets
     assign_public_ip    = module.step_scan.assign_public_ip
   }
+  step_gather = module.step_gather.arn
   ecs_task_roles = [
     module.step_scan.task_role_arn,
     module.step_scan.exec_role_arn

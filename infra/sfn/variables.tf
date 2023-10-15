@@ -10,6 +10,10 @@ variable "step_list" {
   type = string
 }
 
+variable "step_gather" {
+  type = string
+}
+
 variable "step_scan" {
   type = object({
     cluster_arn         = string

@@ -58,6 +58,11 @@ resource "aws_sfn_state_machine" "sfn" {
         }
       },
       "Gather" : {
+        "Type" : "Task",
+        "Resource" : var.step_gather,
+        "Next" : "Transform"
+      },
+      "Transform" : {
         "Type" : "Wait",
         "Seconds" : 1,
         "End" : true
