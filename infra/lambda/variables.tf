@@ -13,3 +13,8 @@ variable "handler" {
 variable "iam_policy_json" {
   type = string
 }
+
+variable "env" {
+  type = map
+  default = {}
+}

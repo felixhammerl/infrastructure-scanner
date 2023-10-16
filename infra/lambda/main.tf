@@ -9,4 +9,7 @@ resource "aws_lambda_function" "this" {
   memory_size      = 512
   publish          = true
   source_code_hash = filebase64sha256(data.archive_file.source.output_path)
+  environment {
+    variables = var.env
+  }
 }

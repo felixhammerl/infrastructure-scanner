@@ -145,6 +145,9 @@ module "step_gather" {
   pkg_path        = "${path.root}/../build/gather"
   handler         = "src/handler/gather.gather_results"
   iam_policy_json = data.aws_iam_policy_document.step_gather_iam_policy.json
+  env = {
+    REPORT_BUCKET = aws_s3_bucket.scan_results.id
+  }
 }
 
 module "sfn" {
