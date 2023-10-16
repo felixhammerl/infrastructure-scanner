@@ -34,14 +34,18 @@ def gather_results(event, context):
         )
 
     master_report = deepcopy(account_reports[0]["report"])
-    master_report = list(unique_everseen([
-        {
-            k: v
-            for k, v in elem.items()
-            if k in ["plugin", "category", "title", "description"]
-        }
-        for elem in master_report
-    ]))
+    master_report = list(
+        unique_everseen(
+            [
+                {
+                    k: v
+                    for k, v in elem.items()
+                    if k in ["plugin", "category", "title", "description"]
+                }
+                for elem in master_report
+            ]
+        )
+    )
     for plugin in master_report:
         plugin["reports"] = {
             report["account"]: [
@@ -56,8 +60,14 @@ def gather_results(event, context):
             for report in account_reports
         }
 
-    master_report_by_category = {k:list(v) for k,v in groupby(master_report, key=itemgetter("category"))}
+    master_report_by_category = {
+        k: list(v) for k, v in groupby(master_report, key=itemgetter("category"))
+    }
 
-    result = s3.put_object(Bucket=bucket, Key=f"{date}/report.json", Body=json.dumps(master_report_by_category).encode())
+    result = s3.put_object(
+        Bucket=bucket,
+        Key=f"{date}/report.json",
+        Body=json.dumps(master_report_by_category).encode(),
+    )
 
     return master_report_by_category

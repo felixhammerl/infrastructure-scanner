@@ -44,12 +44,16 @@ def test_should_create_master_report():
         assert_that(category, is_(instance_of(str)))
         for plugin in plugins:
             for key in plugin.keys():
-                assert_that(key, is_in(["plugin", "category", "title", "description", "reports"]))
+                assert_that(
+                    key,
+                    is_in(["plugin", "category", "title", "description", "reports"]),
+                )
 
             for account, findings in plugin["reports"].items():
                 assert_that(account, is_(instance_of(str)))
                 for finding in findings:
                     for finding_property in finding.keys():
-                        assert_that(finding_property, is_in(["resource", "region", "status", "message"]))
-
-
+                        assert_that(
+                            finding_property,
+                            is_in(["resource", "region", "status", "message"]),
+                        )
