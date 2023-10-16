@@ -15,6 +15,6 @@ variable "iam_policy_json" {
 }
 
 variable "env" {
-  type = map
+  type    = map(any)
   default = {}
 }
