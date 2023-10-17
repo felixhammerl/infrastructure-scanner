@@ -2,7 +2,7 @@
 
 This repository contains all of the code necessary to scan infra in AWS with [Cloudsploit](https://github.com/aquasecurity/cloudsploit).
 
-It orchestrates AWS Step Functions, Lambda, and ECS to do all the heavy lifting around CSPM scanning. 
+It orchestrates AWS Step Functions, Lambda, and ECS to do all the heavy lifting around CSPM scanning.
 
 ## Features
 
@@ -11,10 +11,10 @@ It orchestrates AWS Step Functions, Lambda, and ECS to do all the heavy lifting 
 - [x] Assume `OrganizationAccountAccessRole` to scan child accounts.
 - [x] Write the scan reports to `s3://$S3_BUCKET/$DATE/$ACCOUNT.json`.
 - [ ] Trigger the step function daily on a cronjob.
-- [ ] Add GH Actions pipeline to continuously deploy to AWS account.
+- [x] Add GH Actions pipeline to continuously deploy to AWS account.
 - [ ] Add a way to exclude accounts.
 - [ ] Soft fail when `OrganizationAccountAccessRole` is not present.
-- [ ] Gather the scan reports from all accounts in a single report.
+- [x] Gather the scan reports from all accounts in a single report.
 - [ ] Transform the unified scan report into a nice HTML view.
 - [ ] Add a static S3+Cloudfront site displaying the scan results.
 - [ ] Add simple HTTP auth for the scan result site

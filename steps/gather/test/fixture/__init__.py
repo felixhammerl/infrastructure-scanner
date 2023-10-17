@@ -14,3 +14,7 @@ def read_test_scan_reports():
         for report in report_files
     ]
     return reports
+
+
+def read_fixture(filename):
+    return open(Path(__file__).with_name(filename)).read()

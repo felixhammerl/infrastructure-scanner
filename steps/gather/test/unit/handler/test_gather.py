@@ -9,7 +9,7 @@ from unittest import mock
 
 
 from src.handler.gather import gather_results
-from test.fixture import read_test_scan_reports
+from test.fixture import read_test_scan_reports, read_fixture
 
 BUCKET = "some_bucket"
 
@@ -35,6 +35,9 @@ def test_should_create_master_report():
     result = s3.get_object(Bucket=BUCKET, Key=f"{scan_path}/report.json")
     text = result["Body"].read().decode()
     report_from_s3 = json.loads(text)
+
+    report_from_fixture = json.loads(read_fixture(filename="report.json"))
+    assert_that(report_from_fixture, is_not(equal_to(report_from_s3)))
 
     assert_that(report_from_s3, is_not(empty()))
 
