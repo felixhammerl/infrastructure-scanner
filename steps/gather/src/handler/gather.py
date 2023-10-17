@@ -23,6 +23,9 @@ def gather_results(event, context):
 
     account_reports = []
     for key in keys:
+        if "report.json" in key:
+            continue
+
         result = s3.get_object(Bucket=bucket, Key=key)
         text = result["Body"].read().decode()
         report = json.loads(text)
