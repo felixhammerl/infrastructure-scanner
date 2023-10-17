@@ -30,17 +30,15 @@ def test_should_create_master_report():
             Body=report["content"], Bucket=BUCKET, Key=f"{scan_path}/{report['file']}"
         )
 
-    master_report = gather_results(context=None, event=None)
-
-    assert_that(master_report, is_not(empty()))
+    gather_results(context=None, event=None)
 
     result = s3.get_object(Bucket=BUCKET, Key=f"{scan_path}/report.json")
     text = result["Body"].read().decode()
     report_from_s3 = json.loads(text)
 
-    assert_that(report_from_s3, is_(equal_to(master_report)))
+    assert_that(report_from_s3, is_not(empty()))
 
-    for category, plugins in master_report.items():
+    for category, plugins in report_from_s3.items():
         assert_that(category, is_(instance_of(str)))
         for plugin in plugins:
             for key in plugin.keys():

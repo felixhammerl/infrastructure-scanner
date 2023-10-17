@@ -69,5 +69,3 @@ def gather_results(event, context):
         Key=f"{date}/report.json",
         Body=json.dumps(master_report_by_category).encode(),
     )
-
-    return master_report_by_category
