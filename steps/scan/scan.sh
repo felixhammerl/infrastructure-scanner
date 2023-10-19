@@ -16,7 +16,7 @@ export $(printf "AWS_ACCESS_KEY_ID=%s AWS_SECRET_ACCESS_KEY=%s AWS_SESSION_TOKEN
 )
 
 # Execute Cloudsploit
-./index.js --json=results.json
+./index.js --ignore-ok --json=results.json
 
 # Hop out of the scan account back into the regular account
 unset AWS_ACCESS_KEY_ID
