@@ -63,6 +63,11 @@ resource "aws_sfn_state_machine" "sfn" {
         "Next" : "Transform"
       },
       "Transform" : {
+        "Type" : "Task",
+        "Resource" : var.step_transform,
+        "Next" : "Foo"
+      },
+      "Foo" : {
         "Type" : "Wait",
         "Seconds" : 1,
         "End" : true

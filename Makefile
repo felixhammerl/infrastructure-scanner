@@ -10,16 +10,19 @@ format:
 	find . -name "*.tf" -not -path "*.terraform*" | xargs terraform fmt
 	cd steps/list && pipenv install --dev && pipenv run format
 	cd steps/gather && pipenv install --dev && pipenv run format
+	cd steps/transform && pipenv install --dev && pipenv run format
 
 test-format:
 	find . -name "*.sh" -not -path "*.terraform*" | xargs shellcheck
 	find . -name "*.tf" -not -path "*.terraform*" | xargs terraform fmt -check
 	cd steps/list && pipenv install --dev && pipenv run test-format
 	cd steps/gather && pipenv install --dev && pipenv run test-format
+	cd steps/transform && pipenv install --dev && pipenv run test-format
 
 test-unit:
 	cd steps/list && pipenv install --dev && pipenv run test-unit
 	cd steps/gather && pipenv install --dev && pipenv run test-unit
+	cd steps/transform && pipenv install --dev && pipenv run test-unit
 
 docker:
 	cd infra && terraform init -input=false
@@ -29,6 +32,7 @@ python:
 	cd infra && terraform init -input=false
 	/bin/bash scripts/build-python.sh list
 	/bin/bash scripts/build-python.sh gather
+	/bin/bash scripts/build-python.sh transform
 
 terraform-plan:
 	cd infra && terraform init -input=false

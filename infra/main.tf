@@ -24,7 +24,11 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "scan_results" {
-  bucket_prefix = local.service
+  bucket_prefix = "${local.service}-scan-results"
+}
+
+resource "aws_s3_bucket" "website_bucket" {
+  bucket_prefix = "${local.service}-website"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "scan_results_bucket_encryption" {
@@ -150,6 +154,43 @@ module "step_gather" {
   }
 }
 
+data "aws_iam_policy_document" "step_transform_iam_policy" {
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      aws_s3_bucket.scan_results.arn,
+      "${aws_s3_bucket.scan_results.arn}/*",
+      aws_s3_bucket.website_bucket.arn,
+      "${aws_s3_bucket.website_bucket.arn}/*"
+    ]
+  }
+}
+
+module "step_transform" {
+  source          = "./lambda"
+  function_name   = "${local.service}-transform"
+  pkg_path        = "${path.root}/../build/transform"
+  handler         = "src/handler/transform.transform_report"
+  iam_policy_json = data.aws_iam_policy_document.step_transform_iam_policy.json
+  env = {
+    REPORT_BUCKET  = aws_s3_bucket.scan_results.id
+    WEBSITE_BUCKET = aws_s3_bucket.scan_results.id
+  }
+}
+
 module "sfn" {
   source      = "./sfn"
   module_name = local.service
@@ -162,7 +203,8 @@ module "sfn" {
     subnets             = module.step_scan.subnets
     assign_public_ip    = module.step_scan.assign_public_ip
   }
-  step_gather = module.step_gather.arn
+  step_gather    = module.step_gather.arn
+  step_transform = module.step_transform.arn
   ecs_task_roles = [
     module.step_scan.task_role_arn,
     module.step_scan.exec_role_arn
