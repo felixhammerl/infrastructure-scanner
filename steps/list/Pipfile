@@ -19,3 +19,6 @@ test-unit = "pytest test/unit --disable-pytest-warnings"
 
 [pipenv]
 allow_prereleases = true
+
+[packages]
+boto3 = "*"
