@@ -24,7 +24,7 @@ def transform_report(event, context):
     result = s3.put_object(
         Bucket=website_bucket,
         Key="index.html",
-        Body=json.dumps(page).encode(),
+        Body=page.encode(),
     )
 
 

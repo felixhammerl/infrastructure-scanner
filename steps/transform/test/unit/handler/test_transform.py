@@ -39,8 +39,7 @@ def test_should_transform_report_to_html():
     transform_report(context=None, event=None)
 
     result = s3.get_object(Bucket=WEBSITE_BUCKET, Key=f"index.html")
-    text = result["Body"].read().decode()
-    html_from_s3 = json.loads(text)
+    html_from_s3 = result["Body"].read().decode()
 
     html_from_fixture = read_fixture(filename="index.html")
 
