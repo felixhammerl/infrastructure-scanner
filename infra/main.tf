@@ -187,7 +187,7 @@ module "step_transform" {
   iam_policy_json = data.aws_iam_policy_document.step_transform_iam_policy.json
   env = {
     REPORT_BUCKET  = aws_s3_bucket.scan_results.id
-    WEBSITE_BUCKET = aws_s3_bucket.scan_results.id
+    WEBSITE_BUCKET = aws_s3_bucket.website_bucket.id
   }
 }
 
