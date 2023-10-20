@@ -15,7 +15,7 @@ It orchestrates AWS Step Functions, Lambda, and ECS to do all the heavy lifting 
 - [ ] Add a way to exclude accounts.
 - [ ] Soft fail when `OrganizationAccountAccessRole` is not present.
 - [x] Gather the scan reports from all accounts in a single report.
-- [ ] Transform the unified scan report into a nice HTML view.
+- [x] Transform the unified scan report into a nice HTML view.
 - [ ] Add a static S3+Cloudfront site displaying the scan results.
 - [ ] Add simple HTTP auth for the scan result site
 
