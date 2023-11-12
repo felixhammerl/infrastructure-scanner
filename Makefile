@@ -25,21 +25,21 @@ test-unit:
 	cd steps/transform && pipenv install --dev && pipenv run test-unit
 
 docker:
-	cd infra && terraform init -input=false
+	cd infra && terraform init -input=false -backend-config=../backend.hcl
 	/bin/bash scripts/build-docker.sh scan
 
 python:
-	cd infra && terraform init -input=false
+	cd infra && terraform init -input=false -backend-config=../backend.hcl
 	/bin/bash scripts/build-python.sh list
 	/bin/bash scripts/build-python.sh gather
 	/bin/bash scripts/build-python.sh transform
 
 terraform-plan:
-	cd infra && terraform init -input=false
+	cd infra && terraform init -input=false -backend-config=../backend.hcl
 	cd infra && terraform plan
 
 terraform-apply:
-	cd infra && terraform init -input=false
+	cd infra && terraform init -input=false -backend-config=../backend.hcl
 	cd infra && terraform apply -auto-approve
 
 backend: backend-plan backend-apply
