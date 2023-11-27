@@ -1,12 +1,52 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_s3_bucket" "website_files" {
   bucket_prefix = var.module_name
+}
+
+resource "aws_kms_key" "website_files_bucket_key" {
+  description = "${var.module_name}-website-files-s3-bucket"
+}
+
+resource "aws_kms_key_policy" "website_files_bucket_key" {
+  key_id = aws_kms_key.website_files_bucket_key.id
+  policy = data.aws_iam_policy_document.website_files_bucket_key.json
+}
+
+data "aws_iam_policy_document" "website_files_bucket_key" {
+  statement {
+    actions   = ["kms:*"]
+    resources = ["*"]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
+  statement {
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey*"
+    ]
+    resources = ["*"]
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [aws_cloudfront_distribution.cf.arn]
+    }
+  }
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "website_files_bucket_encryption" {
   bucket = aws_s3_bucket.website_files.id
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "aws:kms"
+      kms_master_key_id = aws_kms_key.website_files_bucket_key.arn
+      sse_algorithm     = "aws:kms"
     }
   }
 }
@@ -64,18 +104,22 @@ resource "aws_cloudfront_origin_access_identity" "cloudfront_oai" {
   comment = "${var.module_name}-OAI"
 }
 
+resource "aws_cloudfront_origin_access_control" "cloudfront_oac" {
+  name                              = "${var.module_name}-oac"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
+
 locals {
   origin_id = "${var.module_name}-origin-id"
 }
 
 resource "aws_cloudfront_distribution" "cf" {
   origin {
-    domain_name = aws_s3_bucket.website_files.bucket_regional_domain_name
-    origin_id   = local.origin_id
-
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.cloudfront_oai.cloudfront_access_identity_path
-    }
+    domain_name              = aws_s3_bucket.website_files.bucket_regional_domain_name
+    origin_id                = local.origin_id
+    origin_access_control_id = aws_cloudfront_origin_access_control.cloudfront_oac.id
   }
 
   enabled             = true
@@ -84,14 +128,14 @@ resource "aws_cloudfront_distribution" "cf" {
   default_root_object = "index.html"
 
   default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = local.origin_id
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = local.origin_id
     viewer_protocol_policy = "redirect-to-https"
 
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    min_ttl     = 0
+    default_ttl = 3600
+    max_ttl     = 86400
 
     forwarded_values {
       query_string = false
@@ -103,16 +147,16 @@ resource "aws_cloudfront_distribution" "cf" {
     }
 
     lambda_function_association {
-      event_type   = "viewer-request"
-      lambda_arn   = var.authenticator_lambda_arn
+      event_type = "viewer-request"
+      lambda_arn = var.authenticator_lambda_arn
     }
   }
 
   ordered_cache_behavior {
-    path_pattern           = "*"
+    path_pattern = "*"
 
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["GET", "HEAD"]
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
     target_origin_id       = local.origin_id
     viewer_protocol_policy = "redirect-to-https"
 
@@ -152,22 +196,31 @@ resource "aws_cloudfront_distribution" "cf" {
 
 resource "aws_s3_bucket_policy" "website_files" {
   bucket = aws_s3_bucket.website_files.id
-  policy = jsonencode({
-    "Version" : "2008-10-17",
-    "Id" : "CloudfrontAccess to Website Files",
-    "Statement" : [
-      {
-        "Sid" : "1",
-        "Effect" : "Allow",
-        "Principal" : {
-          "AWS" : "${aws_cloudfront_origin_access_identity.cloudfront_oai.iam_arn}"
-        },
-        "Action" : "s3:GetObject",
-        "Resource" : "arn:aws:s3:::${aws_s3_bucket.website_files.id}/*"
-      }
-    ]
-  })
+  policy = data.aws_iam_policy_document.website_files.json
+}
 
+data "aws_iam_policy_document" "website_files" {
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.website_files.arn}/*"]
+    principals {
+      type        = "AWS"
+      identifiers = [aws_cloudfront_origin_access_identity.cloudfront_oai.iam_arn]
+    }
+  }
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.website_files.arn}/*"]
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [aws_cloudfront_distribution.cf.arn]
+    }
+  }
 }
 
 resource "aws_route53_record" "root-a" {

@@ -20,11 +20,11 @@ variable "env" {
 }
 
 variable "memory" {
-  type = number
+  type    = number
   default = 512
 }
 
 variable "timeout" {
-  type = number
+  type    = number
   default = 300
 }
