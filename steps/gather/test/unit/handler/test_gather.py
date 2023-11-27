@@ -22,7 +22,12 @@ def test_should_create_master_report():
     reports = read_test_scan_reports()
     s3 = boto3.client("s3")
     s3.create_bucket(
-        ACL="private", Bucket=BUCKET, ObjectOwnership="BucketOwnerPreferred"
+        ACL="private",
+        Bucket=BUCKET,
+        ObjectOwnership="BucketOwnerPreferred",
+        CreateBucketConfiguration={
+            "LocationConstraint": "foo-bar-bla",
+        },
     )
 
     for report in reports:

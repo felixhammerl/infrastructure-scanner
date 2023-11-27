@@ -2,9 +2,10 @@
 
 set -Eeuo pipefail
 
-STEP=$1
-BUILD_DIR="$PWD/build/$STEP"
-SRC_DIR="$PWD/steps/$STEP"
+FOLDER=$1
+INCLUDE_VENV="${2:-"no"}"
+BUILD_DIR="$PWD/build/$FOLDER"
+SRC_DIR="$PWD/$FOLDER"
 export PIPENV_VENV_IN_PROJECT=true
 
 mkdir -p "$BUILD_DIR"
@@ -14,11 +15,11 @@ cp -r "$SRC_DIR/src" "$BUILD_DIR/src"
 cp -r "$SRC_DIR/Pipfile" "$BUILD_DIR/Pipfile"
 cp -r "$SRC_DIR/Pipfile.lock" "$BUILD_DIR/Pipfile.lock"
 
-pipenv install
-
-echo "Creating deployment package ..."
-cp -r "$BUILD_DIR"/.venv/lib/*/site-packages/* "$BUILD_DIR"
-
-pipenv --rm
+if [ "$INCLUDE_VENV" == "--include-venv" ]; then
+    echo "Creating deployment package ..."
+    pipenv install
+    cp -r "$BUILD_DIR"/.venv/lib/*/site-packages/* "$BUILD_DIR"
+    pipenv --rm
+fi
 
 echo "Done!"

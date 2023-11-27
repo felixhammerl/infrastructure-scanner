@@ -18,3 +18,13 @@ variable "env" {
   type    = map(any)
   default = {}
 }
+
+variable "memory" {
+  type = number
+  default = 512
+}
+
+variable "timeout" {
+  type = number
+  default = 300
+}

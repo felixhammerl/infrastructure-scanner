@@ -22,10 +22,6 @@ resource "aws_s3_bucket" "scan_results" {
   bucket_prefix = "${local.service}-scan-results"
 }
 
-resource "aws_s3_bucket" "website_bucket" {
-  bucket_prefix = "${local.service}-website"
-}
-
 resource "aws_s3_bucket_server_side_encryption_configuration" "scan_results_bucket_encryption" {
   bucket = aws_s3_bucket.scan_results.id
   rule {
@@ -81,10 +77,18 @@ data "aws_iam_policy_document" "step_list_iam_policy" {
   }
 }
 
+module "cloudfront" {
+  source                   = "./cloudfront"
+  module_name              = "${local.service}-website"
+  domain_name              = "infrastructure.felixhammerl.com"
+  hosted_zone_id           = "Z0456554X860JV75Q1CZ"
+  authenticator_lambda_arn = module.website_authenticator.qualified_arn
+}
+
 module "step_list" {
   source          = "./lambda"
   function_name   = "${local.service}-list"
-  pkg_path        = "${path.root}/../build/list"
+  pkg_path        = "${path.root}/../build/steps/list"
   handler         = "src/handler/list.list_accounts"
   iam_policy_json = data.aws_iam_policy_document.step_list_iam_policy.json
 }
@@ -141,7 +145,7 @@ data "aws_iam_policy_document" "step_gather_iam_policy" {
 module "step_gather" {
   source          = "./lambda"
   function_name   = "${local.service}-gather"
-  pkg_path        = "${path.root}/../build/gather"
+  pkg_path        = "${path.root}/../build/steps/gather"
   handler         = "src/handler/gather.gather_results"
   iam_policy_json = data.aws_iam_policy_document.step_gather_iam_policy.json
   env = {
@@ -168,8 +172,8 @@ data "aws_iam_policy_document" "step_transform_iam_policy" {
     resources = [
       aws_s3_bucket.scan_results.arn,
       "${aws_s3_bucket.scan_results.arn}/*",
-      aws_s3_bucket.website_bucket.arn,
-      "${aws_s3_bucket.website_bucket.arn}/*"
+      module.cloudfront.s3_bucket_arn,
+      "${module.cloudfront.s3_bucket_arn}/*"
     ]
   }
 }
@@ -177,13 +181,34 @@ data "aws_iam_policy_document" "step_transform_iam_policy" {
 module "step_transform" {
   source          = "./lambda"
   function_name   = "${local.service}-transform"
-  pkg_path        = "${path.root}/../build/transform"
+  pkg_path        = "${path.root}/../build/steps/transform"
   handler         = "src/handler/transform.transform_report"
   iam_policy_json = data.aws_iam_policy_document.step_transform_iam_policy.json
   env = {
     REPORT_BUCKET  = aws_s3_bucket.scan_results.id
-    WEBSITE_BUCKET = aws_s3_bucket.website_bucket.id
+    WEBSITE_BUCKET = module.cloudfront.s3_bucket_id
   }
+}
+
+data "aws_iam_policy_document" "website_authenticator_iam_policy" {
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+    resources = ["*"]
+  }
+}
+
+module "website_authenticator" {
+  source          = "./lambda"
+  function_name   = "${local.service}-basic-auth"
+  pkg_path        = "${path.root}/../build/edge/cloudfront"
+  handler         = "src/handler/basic_auth.enforce_basic_auth"
+  memory          = 128
+  timeout         = 3
+  iam_policy_json = data.aws_iam_policy_document.website_authenticator_iam_policy.json
 }
 
 module "sfn" {

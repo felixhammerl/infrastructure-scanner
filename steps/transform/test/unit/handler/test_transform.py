@@ -21,11 +21,17 @@ WEBSITE_BUCKET = "some_website_bucket"
 def test_should_transform_report_to_html():
     s3 = boto3.client("s3")
     s3.create_bucket(
-        ACL="private", Bucket=REPORT_BUCKET, ObjectOwnership="BucketOwnerPreferred"
+        ACL="private", Bucket=REPORT_BUCKET, ObjectOwnership="BucketOwnerPreferred",
+        CreateBucketConfiguration={
+            "LocationConstraint": "foo-bar-bla",
+        },
     )
 
     s3.create_bucket(
-        ACL="private", Bucket=WEBSITE_BUCKET, ObjectOwnership="BucketOwnerPreferred"
+        ACL="private", Bucket=WEBSITE_BUCKET, ObjectOwnership="BucketOwnerPreferred",
+        CreateBucketConfiguration={
+            "LocationConstraint": "foo-bar-bla",
+        },
     )
 
     scan_path = datetime.date.today().strftime("%Y/%m/%d")
