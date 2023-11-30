@@ -12,7 +12,7 @@ It orchestrates AWS Step Functions, Lambda, and ECS to do all the heavy lifting 
 - [x] Write the scan reports to `s3://$S3_BUCKET/$DATE/$ACCOUNT.json`.
 - [x] Trigger the step function daily on a cronjob.
 - [x] Add GH Actions pipeline to continuously deploy to AWS account.
-- [ ] Add a way to exclude accounts.
+- [x] Add a way to exclude accounts.
 - [ ] Soft fail when `OrganizationAccountAccessRole` is not present.
 - [x] Gather the scan reports from all accounts in a single report.
 - [x] Transform the unified scan report into a nice HTML view.
