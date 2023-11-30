@@ -18,6 +18,10 @@ variable "step_transform" {
   type = string
 }
 
+variable "step_invalidate" {
+  type = string
+}
+
 variable "step_scan" {
   type = object({
     cluster_arn         = string

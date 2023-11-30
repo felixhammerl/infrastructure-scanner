@@ -11,6 +11,7 @@ format:
 	cd steps/list && pipenv install --dev && pipenv run format
 	cd steps/gather && pipenv install --dev && pipenv run format
 	cd steps/transform && pipenv install --dev && pipenv run format
+	cd steps/invalidate && pipenv install --dev && pipenv run format
 	cd edge/cloudfront && pipenv install --dev && pipenv run format
 
 test-format:
@@ -19,12 +20,14 @@ test-format:
 	cd steps/list && pipenv install --dev && pipenv run test-format
 	cd steps/gather && pipenv install --dev && pipenv run test-format
 	cd steps/transform && pipenv install --dev && pipenv run test-format
+	cd steps/invalidate && pipenv install --dev && pipenv run test-format
 	cd edge/cloudfront && pipenv install --dev && pipenv run test-format
 
 test-unit:
 	cd steps/list && pipenv install --dev && pipenv run test-unit
 	cd steps/gather && pipenv install --dev && pipenv run test-unit
 	cd steps/transform && pipenv install --dev && pipenv run test-unit
+	cd steps/invalidate && pipenv install --dev && pipenv run test-unit
 	cd edge/cloudfront && pipenv install --dev && pipenv run test-unit
 
 docker:
@@ -36,6 +39,7 @@ python:
 	/bin/bash scripts/build-python.sh steps/list --include-venv
 	/bin/bash scripts/build-python.sh steps/gather --include-venv
 	/bin/bash scripts/build-python.sh steps/transform --include-venv
+	/bin/bash scripts/build-python.sh steps/invalidate --include-venv
 	/bin/bash scripts/build-python.sh edge/cloudfront
 
 terraform-plan:

@@ -65,11 +65,11 @@ resource "aws_sfn_state_machine" "sfn" {
       "Transform" : {
         "Type" : "Task",
         "Resource" : var.step_transform,
-        "Next" : "Foo"
+        "Next" : "Invalidate"
       },
-      "Foo" : {
-        "Type" : "Wait",
-        "Seconds" : 1,
+      "Invalidate" : {
+        "Type" : "Task",
+        "Resource" : var.step_invalidate,
         "End" : true
       }
     }

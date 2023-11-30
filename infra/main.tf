@@ -162,6 +162,14 @@ data "aws_iam_policy_document" "step_transform_iam_policy" {
     ]
     resources = ["*"]
   }
+  statement {
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey*"
+    ]
+    resources = ["*"]
+  }
 
   statement {
     actions = [
@@ -187,6 +195,33 @@ module "step_transform" {
   env = {
     REPORT_BUCKET  = aws_s3_bucket.scan_results.id
     WEBSITE_BUCKET = module.cloudfront.s3_bucket_id
+  }
+}
+
+data "aws_iam_policy_document" "step_invalidate_iam_policy" {
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    actions   = ["cloudfront:CreateInvalidation"]
+    resources = [module.cloudfront.distribution_arn]
+  }
+}
+
+module "step_invalidate" {
+  source          = "./lambda"
+  function_name   = "${local.service}-invalidate"
+  pkg_path        = "${path.root}/../build/steps/invalidate"
+  handler         = "src/handler/invalidate.invalidate_cloudfront"
+  iam_policy_json = data.aws_iam_policy_document.step_invalidate_iam_policy.json
+  env = {
+    CLOUDFRONT_DISTRIBUTION = module.cloudfront.distribution_id
   }
 }
 
@@ -223,8 +258,9 @@ module "sfn" {
     subnets             = module.step_scan.subnets
     assign_public_ip    = module.step_scan.assign_public_ip
   }
-  step_gather    = module.step_gather.arn
-  step_transform = module.step_transform.arn
+  step_gather     = module.step_gather.arn
+  step_transform  = module.step_transform.arn
+  step_invalidate = module.step_invalidate.arn
   ecs_task_roles = [
     module.step_scan.task_role_arn,
     module.step_scan.exec_role_arn
