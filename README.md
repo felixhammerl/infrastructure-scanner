@@ -64,11 +64,17 @@ The files `infra/.tf-backend/backend.tfplan` and `infra/.tf-backend/backend.tfst
 
 This is the root of the infrastructure orchestration. Everything interesting has been packaged up into modules as far as possible.
 
+### `edge/cloudfront`
+
+This Lambda@Edge acts as the authorizer for the Cloudfront distribution. At the moment, this requires HTTP Basic Auth with username `username` and the password `password`. This is hardcoded and intended only as a placeholder. Feel free to replace this authorizer with whatever makes sense in your ecosystem, e.g. Cognito.
+
 ### `steps`
 
 Here are the AWS Lambda Functions and ECS tasks. This directory includes all the steps within the step function.
 
-* List: Python lambda that lists out the sub-accounts in the org.
-* Scan: ECS task that scans your infrastruture with Cloudsploit and writes the result to `s3://$S3_BUCKET/$DATE/$ACCOUNT.json`
+* `steps/list`: Python lambda that lists out the sub-accounts in the org.
+* `steps/scan`: ECS task that scans your infrastruture with Cloudsploit and writes the result to `s3://$S3_BUCKET/$DATE/$ACCOUNT.json`
+* `steps/gather`: Gathers each account's scan output and transforms them into a common data structure to `s3://$S3_BUCKET/$DATE/result.json`
+* `steps/transform`: Transforms the output from the `Gather` step into an HTML view in the website bucket.
+* `steps/invalidate`: Invalidates the Cloudfront distribution's cache to make space for a new document.
 
-If you have any suggestions about what to do with the scan data, please let me know.

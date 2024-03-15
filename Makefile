@@ -32,14 +32,14 @@ test-unit:
 
 docker:
 	cd infra && terraform init -input=false -backend-config=../backend.hcl
-	/bin/bash scripts/build-docker.sh scan
+	/bin/bash scripts/build-docker.sh steps/scan --repository "$$(cd infra && terraform output -raw scan-repo)"
 
 python:
 	cd infra && terraform init -input=false -backend-config=../backend.hcl
-	/bin/bash scripts/build-python.sh steps/list --include-venv
+	/bin/bash scripts/build-python.sh steps/list
 	/bin/bash scripts/build-python.sh steps/gather --include-venv
 	/bin/bash scripts/build-python.sh steps/transform --include-venv
-	/bin/bash scripts/build-python.sh steps/invalidate --include-venv
+	/bin/bash scripts/build-python.sh steps/invalidate
 	/bin/bash scripts/build-python.sh edge/cloudfront
 
 terraform-plan:
