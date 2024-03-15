@@ -1,0 +1,77 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/steps/gather"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "00:00"
+    groups:
+       updates:
+          patterns:
+            - "*"
+    rebase-strategy: "auto"
+    labels:
+      - "security"
+      - "dependencies"
+
+  - package-ecosystem: "pip"
+    directory: "/steps/invalidate"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "00:00"
+    groups:
+       updates:
+          patterns:
+            - "*"
+    rebase-strategy: "auto"
+    labels:
+      - "security"
+      - "dependencies"
+
+  - package-ecosystem: "pip"
+    directory: "/steps/list"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "00:00"
+    groups:
+       updates:
+          patterns:
+            - "*"
+    rebase-strategy: "auto"
+    labels:
+      - "security"
+      - "dependencies"
+
+  - package-ecosystem: "pip"
+    directory: "/steps/transform"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "00:00"
+    groups:
+       updates:
+          patterns:
+            - "*"
+    rebase-strategy: "auto"
+    labels:
+      - "security"
+      - "dependencies"
+
+  - package-ecosystem: "pip"
+    directory: "/edge/cloudfront"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "00:00"
+    groups:
+       updates:
+          patterns:
+            - "*"
+    rebase-strategy: "auto"
+    labels:
+      - "security"
+      - "dependencies"
+
