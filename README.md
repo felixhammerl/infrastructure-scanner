@@ -13,7 +13,7 @@ It orchestrates AWS Step Functions, Lambda, and ECS to do all the heavy lifting 
 - [x] Trigger the step function daily on a cronjob.
 - [x] Add GH Actions pipeline to continuously deploy to AWS account.
 - [x] Add a way to exclude accounts.
-- [ ] Soft fail when `OrganizationAccountAccessRole` is not present.
+- [x] Soft fail when scanning fails, e.g. when `OrganizationAccountAccessRole` is not present.
 - [x] Gather the scan reports from all accounts in a single report.
 - [x] Transform the unified scan report into a nice HTML view.
 - [x] Add a static S3+Cloudfront site displaying the scan results.
