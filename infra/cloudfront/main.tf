@@ -100,10 +100,6 @@ resource "aws_acm_certificate_validation" "ssl_certificate_validation" {
   validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
 }
 
-resource "aws_cloudfront_origin_access_identity" "cloudfront_oai" {
-  comment = "${var.module_name}-OAI"
-}
-
 resource "aws_cloudfront_origin_access_control" "cloudfront_oac" {
   name                              = "${var.module_name}-oac"
   origin_access_control_origin_type = "s3"
@@ -203,14 +199,6 @@ resource "aws_s3_bucket_policy" "website_files" {
 }
 
 data "aws_iam_policy_document" "website_files" {
-  statement {
-    actions   = ["s3:GetObject"]
-    resources = ["${aws_s3_bucket.website_files.arn}/*"]
-    principals {
-      type        = "AWS"
-      identifiers = [aws_cloudfront_origin_access_identity.cloudfront_oai.iam_arn]
-    }
-  }
   statement {
     actions   = ["s3:GetObject"]
     resources = ["${aws_s3_bucket.website_files.arn}/*"]
