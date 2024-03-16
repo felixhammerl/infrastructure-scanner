@@ -21,7 +21,7 @@ else
         shift;
         case "$opt" in
             "-r"|"--repository" ) REPO=$1; shift;;
-            *                   ) echo "ERROR: Invalid option: \""$opt"\"" >&2; print_usage; exit 1;;
+            *                   ) echo "ERROR: Invalid option: \"$opt\"" >&2; print_usage; exit 1;;
         esac
     done
 fi

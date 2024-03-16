@@ -5,7 +5,7 @@ repos:
         name: Formatting test
         entry: make test-format
         language: system
-        types_or: [terraform, python]
+        types_or: [shell, terraform, python]
         pass_filenames: false
         verbose: true
         stages: [commit]

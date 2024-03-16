@@ -20,9 +20,9 @@ else
     FOLDER="$1"; shift;
     while [[ $# -gt 0 ]]; do
         opt="$1"; shift;
-        case "$opt" in
+        case $opt in
             "-v"|"--include-venv" ) INCLUDE_VENV=true;;
-            *                     ) echo "ERROR: Invalid option: \""$opt"\"" >&2; print_usage; exit 1;;
+            *                     ) echo "ERROR: Invalid option: \"$opt\"" >&2; print_usage; exit 1;;
         esac
     done
 fi
