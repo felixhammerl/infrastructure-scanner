@@ -20,6 +20,11 @@ resource "aws_sfn_state_machine" "sfn" {
         "ItemProcessor" : {
           "StartAt" : "Scan",
           "States" : {
+            "No-op" : {
+              "Type" : "Pass",
+              "ResultPath" : "$.coords",
+              "End" : true
+            },
             "Scan" : {
               "Type" : "Task",
               "Resource" : "arn:aws:states:::ecs:runTask.sync",
@@ -52,6 +57,10 @@ resource "aws_sfn_state_machine" "sfn" {
                   ]
                 }
               },
+              "Catch" : [{
+                "ErrorEquals" : ["States.ALL"],
+                "Next" : "No-op"
+              }],
               "End" : true
             },
           }
