@@ -1,7 +1,7 @@
 # pyright: reportWildcardImportFromLibrary=false
 import json
 from hamcrest import *
-from moto import mock_s3
+from moto import mock_aws
 import boto3
 import datetime
 import os
@@ -15,7 +15,7 @@ REPORT_BUCKET = "some_report_bucket"
 WEBSITE_BUCKET = "some_website_bucket"
 
 
-@mock_s3
+@mock_aws
 @mock.patch.dict(os.environ, {"REPORT_BUCKET": REPORT_BUCKET})
 @mock.patch.dict(os.environ, {"WEBSITE_BUCKET": WEBSITE_BUCKET})
 def test_should_transform_report_to_html():

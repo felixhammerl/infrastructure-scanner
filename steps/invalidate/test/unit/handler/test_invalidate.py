@@ -1,7 +1,7 @@
 # pyright: reportWildcardImportFromLibrary=false
 import json
 from hamcrest import *
-from moto import mock_cloudfront
+from moto import mock_aws
 import boto3
 import pytest
 import os
@@ -13,7 +13,7 @@ from src.handler.invalidate import invalidate_cloudfront
 
 @pytest.fixture()
 def with_mock_cf_distro():
-    with mock_cloudfront():
+    with mock_aws():
         cf = boto3.client("cloudfront")
 
         cf_distribution = cf.create_distribution(

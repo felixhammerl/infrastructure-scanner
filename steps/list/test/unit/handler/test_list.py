@@ -1,14 +1,13 @@
 # pyright: reportWildcardImportFromLibrary=false
 import json
 from hamcrest import *
-from moto import mock_organizations, mock_sts
+from moto import mock_aws
 import boto3
 
 from src.handler.list import list_accounts
 
 
-@mock_organizations
-@mock_sts
+@mock_aws
 def test_should_list_accouns():
     client = boto3.client("organizations")
     client.create_organization(FeatureSet="ALL")

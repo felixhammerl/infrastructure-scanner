@@ -1,7 +1,7 @@
 # pyright: reportWildcardImportFromLibrary=false
 import json
 from hamcrest import *
-from moto import mock_s3
+from moto import mock_aws
 import boto3
 import datetime
 import os
@@ -14,7 +14,7 @@ from test.fixture import read_test_scan_reports, read_fixture
 BUCKET = "some_bucket"
 
 
-@mock_s3
+@mock_aws
 @mock.patch.dict(os.environ, {"REPORT_BUCKET": BUCKET})
 def test_should_create_master_report():
     scan_path = datetime.date.today().strftime("%Y/%m/%d")
