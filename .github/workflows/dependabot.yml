@@ -4,7 +4,7 @@ on: pull_request_target
 jobs:
   dependabot:
     permissions:
-      id-token: read
+      id-token: write
       pull-requests: write
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]'
